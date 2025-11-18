@@ -13,65 +13,29 @@ Franchise Early Warning System (EWS) using LightGBM + SHAP + LLM
 
 본 프로젝트는 5개 데이터셋을 통합한 24개월 시계열 기반 패널 데이터를 활용해
 가맹점의 매출 하락 위험을 조기에 감지(Early Warning System)하는
-AI 기반 경영위기 예측 모델을 구축한 연구 프로젝트입니다.
+AI 기반 경영위기 예측 모델을 구축한 연구 프로젝트입니다.  
 
 LightGBM의 다중분류 모델을 기반으로 4단계 경보 레벨(안전~위험)을 산출하며,
 결과는 SHAP 해석성과 LLM(Claude)을 통해
 실행 가능한 비즈니스 인사이트로 자동 변환됩니다.
 
-📂 Table of Contents
-
-🧩 프로젝트 개요
-
-🛠 기술 스택
-
-📊 데이터셋 설명
-
-🧪 특성 엔지니어링 (60+ Features)
-
-🎯 타겟(4단계 경보 레벨)
-
-⚡ LightGBM 모델 학습
-
-📈 모델 성능
-
-🔍 SHAP 해석성
-
-🤖 LLM 통합 분석
-
-📊 시각화 & 리포트
-
-🧠 고찰
-
-📌 한계 & 개선 방향
-
-📁 프로젝트 구조
-
-🔚 결론
-
 ---
-**🧩 프로젝트 개요**
+**🧩 프로젝트 개요**  
 경영 위기는 사후 대응으로는 이미 늦은 경우가 많음
 → 매출·고객·상권 정보 등 다양한 지표를 종합한 조기 감지(EWS)가 필요함.
 
-본 모델은
-
-5개 데이터셋 통합
-
-60+ 비즈니스/시계열 특성
-
-LightGBM 기반 4단계 위험 분류
-
-Time-Series Cross Validation
-
-월별 백테스트(18개월)
-
-SHAP / LLM 분석 자동화
-
-까지 완비한 현업 수준의 의사결정 지원 시스템입니다.
+본 모델은  
+5개 데이터셋 통합  
+60+ 비즈니스/시계열 특성  
+LightGBM 기반 4단계 위험 분류  
+Time-Series Cross Validation  
+월별 백테스트(18개월)  
+SHAP / LLM 분석 자동화  
+까지 완비한 현업 수준의 의사결정 지원 시스템입니다.  
 
 ---
-**🛠 기술 스택**
+**🛠 기술 스택**  
+```
 Category	Tools
 ML Model	LightGBM (Multiclass)
 Feature	Pandas, NumPy
@@ -80,9 +44,10 @@ LLM	OpenAI GPT API
 Visualization	Matplotlib, Seaborn
 Validation	Time Series CV, Monthly Backtest
 Runtime	Python 3.10+
+```
 
 ---
-**📊 데이터셋 설명**
+**📊 데이터셋 설명**  
 
 총 5개 데이터셋을 통합하여 2023.01~2024.12 (24개월) 시계열 패널 생성.
 
@@ -91,8 +56,8 @@ Runtime	Python 3.10+
 매출/운영	매출액, 고객수, 이용건수, 승인율, 배달비중
 고객 특성	10개 세그먼트(성별×연령), 재구매율, 신규비율
 임대료	1층/비1층, 임대료 변화율
-유동인구	유동·주거·직장 인구 변화율
-🧪 특성 엔지니어링 (60+ Features)
+유동인구	유동·주거·직장 인구 변화율    
+🧪 특성 엔지니어링 (60+ Features)  
 🔹 1) 시계열 기반 특성
 
 1M / 3M / 6M 변화율
@@ -100,7 +65,7 @@ Runtime	Python 3.10+
 3M 추세 지표
 3M 변동성(Std)
 
-최근 6M 최대 대비 비율
+최근 6M 최대 대비 비율  
 
 🔹 2) 세대별 고객 특성
 
@@ -112,7 +77,7 @@ Runtime	Python 3.10+
 주력 세대
 고객 다양성 지수(엔트로피)
 
-🔹 3) 고급 특성
+🔹 3) 고급 특성  
 
 연속 하락 개월 수
 임대료·유동인구 대비 매출 효율
@@ -124,18 +89,21 @@ Runtime	Python 3.10+
 미래 3개월 매출 변화율 기반:
 
 레벨	기준	의미
-0	> +10%	안전
-1	-10%~+10%	주의
-2	-30%~-10%	경고
+```
+0	> +10%	안전  
+1	-10%~+10%	주의  
+2	-30%~-10%	경고  
 3	≤ -30%	위험
+```
 
-추가 기준
-고객 급감
-연속 하락
-→ 위험도 레벨 보정
+추가 기준  
+고객 급감  
+연속 하락  
+→ 위험도 레벨 보정  
 
-**⚡ LightGBM 모델 학습**
+**⚡ LightGBM 모델 학습**    
 🔹 모델 파라미터
+```
 params = {
     'objective': 'multiclass',
     'num_class': 4,
@@ -150,6 +118,7 @@ params = {
     'reg_lambda': 0.1,
     'is_unbalance': True
 }
+```
 
 🔹 학습 전략
 
@@ -157,7 +126,7 @@ Time Series Split (5-Fold Rolling Window)
 Early Stopping 100 rounds
 Class Imbalance 보정 (is_unbalance, scale_pos_weight)
 
-**📈 모델 성능**
+**📈 모델 성능**  
 🔹 교차검증 (TS-CV)
 
 F1 = 0.86
@@ -176,13 +145,14 @@ PR-AUC = 0.88
 경고	0.81	0.82	0.82
 위험	0.88	0.89	0.88
 평균	0.87	0.86	0.86
-**🔍 SHAP 해석성**
+
+---
+**🔍 SHAP 해석성**  
 
 상위 40개 변수 중요도 시각화
 개별 가맹점 SHAP Force Plot 생성
 멀티클래스 오류 해결:
 TreeExplainer(model, model_output='raw')
-
 
 주요 영향 변수:
 
@@ -192,7 +162,7 @@ TreeExplainer(model, model_output='raw')
 임대료 대비 매출 비율
 연속 하락 개월수
 
-**🤖 LLM 통합 분석**
+**🤖 LLM 통합 분석**  
 🔹 목적
 
 위험 가맹점 Top 20에 대해
@@ -206,7 +176,7 @@ TreeExplainer(model, model_output='raw')
 세대별 고객 변화
 SHAP 주요 요인
 
-🔹 출력 예시
+🔹 출력 예시  
 위험 요인:
 1. 최근 3개월 매출 -28% 감소
 2. 2030세대 비중 20%p 감소
@@ -215,7 +185,7 @@ SHAP 주요 요인
 1. 젊은층 타겟 SNS 캠페인 진행
 2. 배달 플랫폼 신규 유입 프로모션 실시
 
-**📊 시각화 & 리포트**
+**📊 시각화 & 리포트**  
 포함된 시각화
 경보 레벨 분포
 세대별 고객 변화
@@ -231,8 +201,8 @@ LLM 자연어 분석 리포트
 <img width="861" height="500" alt="image" src="https://github.com/user-attachments/assets/78fe8962-35fb-4b65-ac84-db6c1bd7257c" />
 
 
-**🧠 고찰**
-✔ 주요 학습 사항
+**🧠 고찰**  
+✔ 주요 학습 사항  
 
 Time Series CV 중요성
 
@@ -242,7 +212,7 @@ SHAP + LLM → AI 예측을 실행 가능한 지식으로 변환
 
 규칙 기반 → 100% 데이터 기반 판단 시스템 전환
 
-✔ 기술적 도전 해결
+✔ 기술적 도전 해결  
 
 클래스 불균형 → is_unbalance
 
@@ -252,7 +222,7 @@ SHAP Multiclass 오류 → model_output=raw
 
 18개월 백테스트 안정성 확보(F1±1%)
 
-📌 한계 & 개선 방향
+**📌 한계 & 개선 방향**  
 현재 한계	향후 개선안
 월 단위 예측	주·일 단위 세밀화
 정적 과거 데이터	실시간 데이터 스트리밍
@@ -286,10 +256,10 @@ EWS-Project/
 │
 └── README.md
 ```
-🔚 결론
 
-본 프로젝트는
+**🔚 결론**
 
+본 프로젝트는  
 정확한 위험 탐지(86% F1)
 
 시계열 기반 백테스트 검증
